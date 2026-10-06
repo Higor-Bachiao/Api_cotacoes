@@ -1,0 +1,57 @@
+{
+  "info": {
+    "name": "Trabalho 1 - Cotacoes (Higor e Olimpio)",
+    "description": "AwesomeAPI - cotacao de moedas com historico. Servidor local em http://localhost/cotacoes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1 - API publica direta (USD-BRL) - 200",
+      "request": {
+        "method": "GET",
+        "url": "https://economia.awesomeapi.com.br/json/last/USD-BRL"
+      }
+    },
+    {
+      "name": "2 - Servidor: consultar e salvar - 201",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"moeda\": \"USD-BRL\"\n}" },
+        "url": "http://localhost/cotacoes/api/consultar.php"
+      }
+    },
+    {
+      "name": "3 - Servidor: listar salvos - 200",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost/cotacoes/api/listar.php"
+      }
+    },
+    {
+      "name": "4 - ERRO: parametro invalido - 400",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"moeda\": \"dolar\"\n}" },
+        "url": "http://localhost/cotacoes/api/consultar.php"
+      }
+    },
+    {
+      "name": "5 - ERRO: moeda inexistente - 404",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"moeda\": \"XXX-BRL\"\n}" },
+        "url": "http://localhost/cotacoes/api/consultar.php"
+      }
+    },
+    {
+      "name": "6 - Servidor: listar filtrando por moeda - 200",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost/cotacoes/api/listar.php?moeda=USD-BRL"
+      }
+    }
+  ]
+}

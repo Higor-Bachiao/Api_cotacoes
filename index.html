@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cotação de Moedas</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 30px auto; padding: 0 16px; color: #1c2a4a; }
+    h1 { margin-bottom: 4px; }
+    .sub { color: #666; margin-top: 0; }
+    form { display: flex; gap: 8px; margin: 20px 0; }
+    input { flex: 1; padding: 10px; font-size: 16px; text-transform: uppercase; }
+    button { padding: 10px 20px; font-size: 16px; background: #1e3a7a; color: #fff; border: 0; cursor: pointer; }
+    button:disabled { opacity: .6; }
+    #resultado { padding: 14px; border-radius: 6px; margin-bottom: 24px; display: none; }
+    #resultado.ok { display: block; background: #e6f4ea; }
+    #resultado.erro { display: block; background: #fdecea; color: #a12622; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; font-size: 14px; }
+    th { background: #1c2a4a; color: #fff; }
+  </style>
+</head>
+<body>
+  <h1>Cotação de Moedas</h1>
+  <p class="sub">Trabalho 1 — LP VIII — Higor e Olimpio — AwesomeAPI</p>
+
+  <form id="form-busca">
+    <input id="moeda" placeholder="Par de moedas, ex.: USD-BRL" maxlength="11" required>
+    <button id="btn" type="submit">Consultar</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <h2>Histórico salvo</h2>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Par</th><th>Compra</th><th>Venda</th><th>Variação</th><th>Data da cotação</th><th>Consultado em</th></tr>
+    </thead>
+    <tbody id="historico"></tbody>
+  </table>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
