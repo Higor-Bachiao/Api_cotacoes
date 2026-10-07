@@ -66,6 +66,9 @@ O caminho de uma consulta:
 6. O PHP devolve o registro gravado em JSON, com status **201**.
 7. A página mostra o resultado e recarrega o histórico com `GET api/listar.php`.
 
+Cada linha do histórico tem um botão **Excluir**, que envia `DELETE api/excluir.php?id=...`
+com `fetch()` e recarrega a tabela.
+
 A interface **nunca** acessa o banco nem a API pública: quem faz isso é o servidor.
 
 **Por quê?**
@@ -78,13 +81,14 @@ A interface **nunca** acessa o banco nem a API pública: quem faz isso é o serv
 
 ```
 cotacoes/
-├── index.html              interface (campo, botão, resultado, histórico)
+├── index.html              interface (campo, botão, resultado, histórico com botão Excluir)
 ├── js/app.js               fetch() para o nosso servidor
 ├── api/
 │   ├── config.php          credenciais do banco e URL da API
 │   ├── funcoes.php         conexão, resposta JSON e validação
 │   ├── consultar.php       POST: chama a API, grava e devolve JSON
-│   └── listar.php          GET: lista os registros salvos
+│   ├── listar.php          GET: lista os registros salvos
+│   └── excluir.php         DELETE: exclui um registro pelo id
 ├── sql/banco.sql           criação do banco e da tabela
 └── postman/                coleção exportada
 ```
@@ -112,20 +116,21 @@ Banco `trabalho_cotacoes`, tabela `cotacoes`, criados pelo script `sql/banco.sql
 |---|---|---|---|
 | POST | `/cotacoes/api/consultar.php` | Corpo `{"moeda":"USD-BRL"}`. Consulta a API, grava e devolve a cotação | 201, 400, 404, 405, 500, 502 |
 | GET | `/cotacoes/api/listar.php` | Lista o histórico (aceita `?moeda=USD-BRL`) | 200, 400, 405, 500 |
+| DELETE | `/cotacoes/api/excluir.php?id=1` | Exclui o registro com o id informado | 200, 400, 404, 405, 500 |
 
-A consulta usa **POST** porque cada chamada cria um registro no histórico
-(nada é gravado, alterado ou excluído por link GET).
+A consulta usa **POST** porque cada chamada cria um registro no histórico, e a
+exclusão usa **DELETE** (nada é gravado, alterado ou excluído por link GET).
 
 ### Significado de cada status
 
 | Status | Quando acontece |
 |---|---|
-| **200** | Listagem devolvida |
+| **200** | Listagem devolvida ou registro excluído |
 | **201** | Cotação consultada e registro criado |
-| **400** | Parâmetro `moeda` ausente ou fora do formato `USD-BRL` |
-| **404** | Formato correto, mas a API não conhece o par |
-| **405** | Método errado (ex.: GET em `consultar.php`) |
-| **500** | Falha ao conectar ou gravar no banco |
+| **400** | Parâmetro `moeda` fora do formato `USD-BRL`, ou `id` que não é um inteiro positivo |
+| **404** | A API não conhece o par, ou não existe registro com o `id` informado |
+| **405** | Método errado (ex.: GET em `consultar.php` ou em `excluir.php`) |
+| **500** | Falha ao conectar, gravar ou excluir no banco |
 | **502** | A API externa não respondeu ou respondeu com erro |
 
 ### Exemplos
@@ -172,11 +177,24 @@ GET /cotacoes/api/listar.php
 }
 ```
 
+Excluir um registro:
+
+```
+DELETE /cotacoes/api/excluir.php?id=5
+```
+
+```json
+200 OK
+{"mensagem": "Cotacao excluida.", "id": 5}
+```
+
 Erros:
 
 ```json
 400  {"erro": "Parametro \"moeda\" invalido. Use o formato USD-BRL."}
+400  {"erro": "Parametro \"id\" invalido. Informe um numero inteiro positivo."}
 404  {"erro": "Par de moedas \"XXX-BRL\" nao encontrado."}
+404  {"erro": "Cotacao com id 5 nao encontrada."}
 405  {"erro": "Metodo nao permitido. Use POST."}
 502  {"erro": "A API externa respondeu com status 429."}
 ```
@@ -213,6 +231,8 @@ Importe `postman/Trabalho1_Cotacoes.postman_collection.json`.
 | 4 | Erro proposital: parâmetro inválido | POST | `{"moeda":"dolar"}` | 400 |
 | 5 | Erro proposital: moeda inexistente | POST | `{"moeda":"XXX-BRL"}` | 404 |
 | 6 | Servidor: listar filtrando por moeda | GET | — | 200 |
+| 7 | Servidor: excluir registro (`?id=1`) | DELETE | — | 200 |
+| 8 | Erro proposital: excluir id inexistente (`?id=999999`) | DELETE | — | 404 |
 
 A requisição 4 é barrada pela validação do nosso servidor e nem chega à AwesomeAPI.
 A requisição 5 depende da API: se ela estiver limitando as chamadas, o servidor
@@ -222,12 +242,12 @@ devolve 502 em vez de 404.
 
 - **Validação no servidor:** a função `validarPar()` (`api/funcoes.php`) confere o formato
   mesmo que o front já tenha validado.
-- **Prepared statements:** o INSERT e os SELECT usam `prepare()` e `bind_param()`; nenhum
-  valor vindo de fora é concatenado no SQL.
+- **Prepared statements:** o INSERT, os SELECT e o DELETE usam `prepare()` e `bind_param()`;
+  nenhum valor vindo de fora é concatenado no SQL.
 - **Credenciais só no servidor:** usuário e senha do banco ficam em `api/config.php`; o
   JavaScript não conhece o banco nem a API pública.
-- **Nada é gravado por GET:** a gravação só acontece por POST; GET em `consultar.php`
-  devolve 405.
+- **Nada é gravado nem excluído por GET:** a gravação só acontece por POST e a exclusão
+  só por DELETE; GET em `consultar.php` ou em `excluir.php` devolve 405.
 - **Saída segura na página:** o histórico é montado com `textContent`, que não interpreta HTML.
 
 ## Observações sobre a API

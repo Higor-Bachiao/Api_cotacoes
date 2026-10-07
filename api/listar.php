@@ -17,7 +17,7 @@ if (isset($_GET['moeda']) && $_GET['moeda'] !== '') {
     }
 }
 
-$con = conectar();
+$con = conectar(); // essa função já trata erros de conexão e responde com 500 se falhar
 try {
     if ($par !== null) {
         $stmt = $con->prepare('SELECT * FROM cotacoes WHERE par = ? ORDER BY id DESC LIMIT 100');

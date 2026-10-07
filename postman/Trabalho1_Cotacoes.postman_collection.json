@@ -52,6 +52,20 @@
         "method": "GET",
         "url": "http://localhost/cotacoes/api/listar.php?moeda=USD-BRL"
       }
+    },
+    {
+      "name": "7 - Servidor: excluir registro - 200",
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost/cotacoes/api/excluir.php?id=1"
+      }
+    },
+    {
+      "name": "8 - ERRO: excluir id inexistente - 404",
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost/cotacoes/api/excluir.php?id=999999"
+      }
     }
   ]
 }

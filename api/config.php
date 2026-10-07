@@ -7,4 +7,4 @@ define('DB_PASS', '');
 define('DB_NAME', 'trabalho_cotacoes');
 
 // Endereco base da API publica sorteada (AwesomeAPI).
-define('API_URL', 'https://economia.awesomeapi.com.br/json/last/');
+define('API_URL', 'https://economia.awesomeapi.com.br/json/last/'); // nessa api tem o conteudo de todas as moedas, mas vamos usar apenas USD-BRL e EUR-BRL

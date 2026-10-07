@@ -21,7 +21,7 @@ async function carregarHistorico() {
 
     historico.innerHTML = '';
     if (dados.cotacoes.length === 0) {
-      historico.innerHTML = '<tr><td colspan="7">Nenhuma cotação salva ainda.</td></tr>';
+      historico.innerHTML = '<tr><td colspan="8">Nenhuma cotação salva ainda.</td></tr>';
       return;
     }
     for (const c of dados.cotacoes) {
@@ -32,10 +32,37 @@ async function carregarHistorico() {
         td.textContent = valor; // textContent evita injecao de HTML
         tr.appendChild(td);
       }
+      // Ultima coluna: botao que exclui o registro desta linha
+      const tdAcao = document.createElement('td');
+      const botaoExcluir = document.createElement('button');
+      botaoExcluir.type = 'button';
+      botaoExcluir.className = 'excluir';
+      botaoExcluir.textContent = 'Excluir';
+      botaoExcluir.addEventListener('click', () => excluir(c.id));
+      tdAcao.appendChild(botaoExcluir);
+      tr.appendChild(tdAcao);
       historico.appendChild(tr);
     }
   } catch (e) {
-    historico.innerHTML = '<tr><td colspan="7">Não foi possível carregar o histórico.</td></tr>';
+    historico.innerHTML = '<tr><td colspan="8">Não foi possível carregar o histórico.</td></tr>';
+  }
+}
+
+// Pede ao servidor para excluir um registro (metodo DELETE) e recarrega a tabela
+async function excluir(id) {
+  if (!confirm(`Excluir o registro ${id}?`)) return;
+  try {
+    const resp = await fetch('api/excluir.php?id=' + id, { method: 'DELETE' });
+    const dados = await resp.json();
+
+    if (!resp.ok) {
+      mostrar('erro', dados.erro || 'Erro ao excluir o registro.');
+      return;
+    }
+    mostrar('ok', `Registro ${id} excluído.`);
+    carregarHistorico();
+  } catch (e) {
+    mostrar('erro', 'Não foi possível falar com o servidor. Verifique se o Apache está ligado.');
   }
 }
 
