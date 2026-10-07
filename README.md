@@ -257,3 +257,6 @@ devolve 502 em vez de 404.
   `consultado_em` (momento da nossa consulta), que é o que forma o histórico.
 - Sem chave, a API também limita a quantidade de chamadas e passa a responder 429.
   O servidor trata isso como falha da API externa (502).
+- Para usar uma chave (cadastro gratuito em https://awesomeapi.com.br), preencha `API_KEY`
+  em `api/config.php`. O servidor envia a chave no cabeçalho `x-api-key`; ela nunca vai
+  para o navegador. Com `API_KEY` vazio a aplicação funciona sem chave.

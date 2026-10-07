@@ -27,6 +27,10 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT        => 10,
 ]);
+// Se houver chave configurada, envia no cabecalho (aumenta o limite de requisicoes)
+if (API_KEY !== '') {
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['x-api-key: ' . API_KEY]);
+}
 $resposta   = curl_exec($ch);
 $statusApi  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $erroCurl   = curl_error($ch);
